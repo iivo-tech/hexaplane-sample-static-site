@@ -2,4 +2,10 @@
 <meta charset="utf-8">
 <title>Hexaplane sample static site</title>
 <h1>Hexaplane</h1>
-<p>Built hermetically by Kaniko under a hardened runtime.</p>
+<p>Built hermetically by Kaniko under a hardened runtime, scanned, signed, and served.</p>
+<!-- La cadena de abajo es un ANCLA DE PRUEBA, no decoracion: la asercion de
+     REQ-0025 en platform/verify.sh la busca en la respuesta HTTP para
+     distinguir "el controlador de ingress contesta algo" de "contesta ESTE
+     sitio". Un 200 con la pagina por defecto de nginx cumpliria lo primero y
+     no lo segundo. No la cambies sin cambiar la asercion. -->
+<p id="hexaplane-marker">hexaplane-sample-site-is-live</p>
