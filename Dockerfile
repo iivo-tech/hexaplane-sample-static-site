@@ -17,6 +17,13 @@
 FROM busybox:1.37-musl@sha256:5cec3fc171c87218698e85a52af7087de727372aae264a787b8112901a5b0092 AS busybox
 
 FROM postgres:18-alpine@sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873
+# SIN gosu. La imagen de postgres lo trae para que su entrypoint cambie de
+# usuario, y esta App no usa ese entrypoint. El gosu de la base está compilado
+# con Go 1.24.6 (CVE-2025-68121, CRITICAL), y el escaneo de la plataforma
+# rechaza la imagen por él: la primera corrida de la prueba en bare-metal no
+# llegó a servir. Borrarlo no necesita red, y Trivy no ve un archivo borrado
+# en una capa posterior.
+RUN rm /usr/local/bin/gosu
 COPY --from=busybox /bin/busybox /usr/local/bin/busybox-httpd
 COPY www/ /www/
 USER 70
