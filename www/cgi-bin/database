@@ -1,0 +1,16 @@
+#!/bin/sh
+# Lo que la App lee de su base con DATABASE_URL. Nunca imprime la variable: la
+# URI lleva la contrasena.
+printf 'Content-Type: text/plain\r\n\r\n'
+if [ -z "$DATABASE_URL" ]; then
+  echo "no-database-url"
+  exit 0
+fi
+if out=$(PGCONNECT_TIMEOUT=5 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -tAc \
+    "select 'database=' || current_database() || ' tokens=' || coalesce((select string_agg(token, ',' order by token) from conformance_database_url), '')" 2>&1); then
+  echo "ok $out"
+else
+  # Solo la primera linea y sin la URI: basta para saber si fue la red, la
+  # autenticacion o la tabla.
+  echo "error $(echo "$out" | head -n 1 | sed 's#postgres[a-z]*://[^ ]*#<uri>#g')"
+fi
