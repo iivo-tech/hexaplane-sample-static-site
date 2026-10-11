@@ -28,3 +28,10 @@
 FROM nginxinc/nginx-unprivileged:1.29-alpine@sha256:0c79d56aee561a1d81c63f00eee5fb5fe29279560cdc55e91425133104c7fbe6
 COPY index.html /usr/share/nginx/html/index.html
 EXPOSE 8080
+
+# RAMA rollout-slow-start: EL PUERTO SE ABRE 15 s DESPUES DE ARRANCAR, y es lo
+# que mide la prueba de REQ-0054 en Hexaplane (tests/conformance/
+# app_rollout_test.go). Sin sonda de readiness, el pod nuevo recibe trafico en
+# cuanto arranca y esos 15 s son peticiones perdidas. La espera usa el sleep de
+# busybox que ya trae la base: el build no tiene internet para instalar nada.
+CMD ["/bin/sh", "-c", "sleep 15 && exec nginx -g 'daemon off;'"]
