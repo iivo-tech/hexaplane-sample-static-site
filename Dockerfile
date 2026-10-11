@@ -28,3 +28,11 @@
 FROM nginxinc/nginx-unprivileged:1.29-alpine@sha256:0c79d56aee561a1d81c63f00eee5fb5fe29279560cdc55e91425133104c7fbe6
 COPY index.html /usr/share/nginx/html/index.html
 EXPOSE 8080
+
+# RAMA rollout-never-ready: EL CONTENEDOR ARRANCA Y NUNCA ABRE EL PUERTO. Es el
+# Build que construye, se escanea y se firma bien y despliega algo que no
+# arranca, y lo usa la prueba de REQ-0055 en Hexaplane (tests/conformance/
+# app_rollout_test.go): lo que estaba en vivo tiene que seguir sirviendo. El
+# bucle, y no `sleep infinity`, porque no todas las versiones de busybox lo
+# admiten.
+CMD ["/bin/sh", "-c", "while true; do sleep 3600; done"]
