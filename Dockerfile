@@ -27,4 +27,7 @@
 # commit producen imagenes distintas y el digest deja de identificar al codigo.
 FROM nginxinc/nginx-unprivileged:1.29-alpine@sha256:0c79d56aee561a1d81c63f00eee5fb5fe29279560cdc55e91425133104c7fbe6
 COPY index.html /usr/share/nginx/html/index.html
+# RAMAS health-path-*: un default.conf propio con la ruta /healthz (REQ-0057 de
+# Hexaplane). Ver la cabecera de default.conf.
+COPY default.conf /etc/nginx/conf.d/default.conf
 EXPOSE 8080
