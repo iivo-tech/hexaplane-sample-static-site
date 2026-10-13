@@ -1,12 +1,25 @@
 #!/bin/sh
-# Lo que la App lee de su base con DATABASE_URL. Nunca imprime la variable: la
-# URI lleva la contrasena.
+# Lo que la App lee de su base con la URI de una variable. Nunca imprime la
+# variable: la URI lleva la contrasena.
+#
+# CUAL VARIABLE: HEXAPLANE_DATABASE_URL, la que pone la plataforma (ADR-0118),
+# o DATABASE_URL con ?var=DATABASE_URL, la que el tenant declara como
+# $(HEXAPLANE_DATABASE_URL). Solo esas dos: el nombre va a un eval.
+case "${QUERY_STRING#var=}" in
+  ''|HEXAPLANE_DATABASE_URL) var=HEXAPLANE_DATABASE_URL ;;
+  DATABASE_URL) var=DATABASE_URL ;;
+  *)
+    printf 'Status: 400 Bad Request\r\nContent-Type: text/plain\r\n\r\nvar es HEXAPLANE_DATABASE_URL o DATABASE_URL\n'
+    exit 0
+    ;;
+esac
+eval "uri=\"\${$var}\""
 printf 'Content-Type: text/plain\r\n\r\n'
-if [ -z "$DATABASE_URL" ]; then
-  echo "no-database-url"
+if [ -z "$uri" ]; then
+  echo "no-$var"
   exit 0
 fi
-if out=$(PGCONNECT_TIMEOUT=5 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -tAc \
+if out=$(PGCONNECT_TIMEOUT=5 psql "$uri" -v ON_ERROR_STOP=1 -tAc \
     "select 'database=' || current_database() || ' tokens=' || coalesce((select string_agg(token, ',' order by token) from conformance_database_url), '')" 2>&1); then
   echo "ok $out"
 else

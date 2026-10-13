@@ -1,6 +1,8 @@
-# App de conformidad de REQ-0047: responde, en /cgi-bin/database, lo que la
-# PROPIA App lee de su base con la variable DATABASE_URL que le inyecta la
-# plataforma (ADR-0096). No es un sitio: es la sonda de una prueba.
+# App de conformidad de REQ-0061: responde, en /cgi-bin/database, lo que la
+# PROPIA App lee de su base con la variable HEXAPLANE_DATABASE_URL que le
+# inyecta la plataforma (ADR-0118), o con ?var=DATABASE_URL, la que el tenant
+# declara como $(HEXAPLANE_DATABASE_URL). No es un sitio: es la sonda de una
+# prueba.
 #
 # SIN INSTALAR NADA, Y NO ES UNA PREFERENCIA. El pod de build no alcanza
 # internet, solo el Artifact Registry del proyecto con su espejo de Docker Hub
