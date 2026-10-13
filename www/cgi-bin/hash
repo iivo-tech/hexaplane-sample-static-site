@@ -1,0 +1,21 @@
+#!/bin/sh
+# /cgi-bin/hash?name=X: el sha256 de la variable de entorno X, o 404 si la App
+# no la tiene. Nunca el valor.
+#
+# EL NOMBRE SE VALIDA ANTES DE USARLO: va dentro de un eval, y solo un nombre
+# de variable de entorno de la App (^[A-Z_][A-Z0-9_]*$) puede llegar ahí.
+name=${QUERY_STRING#name=}
+case "$name" in
+  ''|*[!A-Z0-9_]*|[0-9]*)
+    printf 'Status: 400 Bad Request\r\nContent-Type: text/plain\r\n\r\nname no es un nombre de variable\n'
+    exit 0
+    ;;
+esac
+if ! eval "[ \"\${$name+set}\" = set ]"; then
+  printf 'Status: 404 Not Found\r\nContent-Type: text/plain\r\n\r\nla App no tiene %s\n' "$name"
+  exit 0
+fi
+# EL HTTPD DE BUSYBOX PASA A UN CGI SU PROPIO ENTORNO, no solo las variables
+# CGI: las del contenedor llegan tal cual.
+sum=$(eval "printf %s \"\${$name}\"" | sha256sum | cut -d' ' -f1)
+printf 'Content-Type: text/plain\r\n\r\n%s\n' "$sum"
