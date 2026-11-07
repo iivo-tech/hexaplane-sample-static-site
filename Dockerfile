@@ -25,7 +25,11 @@
 #
 # FIJADO POR DIGEST (REQ-0021): con una etiqueta movil, dos builds del mismo
 # commit producen imagenes distintas y el digest deja de identificar al codigo.
-FROM nginxinc/nginx-unprivileged:1.29-alpine@sha256:0c79d56aee561a1d81c63f00eee5fb5fe29279560cdc55e91425133104c7fbe6
+# LA VARIANTE -slim, NO LA COMPLETA (como en main). La completa trae brotli-libs,
+# afectada por CVE-2026-111497 (CRITICAL), y el paso `scan` de Hexaplane la
+# bloquea; a 2026-11-07 ninguna etiqueta -alpine de upstream trae el arreglo. La
+# -slim es el mismo nginx 1.29.8 sobre la misma Alpine 3.23.4, sin root (101).
+FROM nginxinc/nginx-unprivileged:1.29-alpine-slim@sha256:59678856b05324b7f6371f26eb1520be7fcd8bdc8ab380fc4913db8503e5a842
 COPY index.html /usr/share/nginx/html/index.html
 # RAMAS health-path-*: un default.conf propio con la ruta /healthz (REQ-0057 de
 # Hexaplane). Ver la cabecera de default.conf.
